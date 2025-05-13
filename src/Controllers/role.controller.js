@@ -14,7 +14,7 @@ const getAll = async (req, resp, next) => {
     } else {
       data = { message: "This table has no records" };
     }
-    response.success(req, resp, data, 200);
+    response.success(req, res, data, 200);
   } catch (error) {
     next(error);
   }
