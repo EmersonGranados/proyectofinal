@@ -1,55 +1,23 @@
-const Auth = require("../models/auth.model");
-const User = require("../models/user.model");
-const response = require("../res/response");
-const bcrypt = require("bcrypt");
-const auth = require("../auth");
+const { successResponse, errorResponse } = require('../utils/response');
+const authService = require('../services/auth.services');
 
-async function login(req, res, next) {
-  let email = req.body.email;
-  let password = req.body.password;
-  try {
-    const data = await Auth.findOne({ where: { email } });
-    const user = await User.findOne({ where: { email } });
-    const resp = await validatePassword(password, data.password, data, user);
-    response.success(req, res, resp, 200);
-  } catch (error) {
-    next(error);
-  }
-}
-
-const validatePassword = (pass1, pass2, data, user) => {
-  return bcrypt.compare(pass1, pass2).then((res) => {
-    if (res === true) {
-      data.RolId = user.RolId;
-        var resp = {
-          token: auth.assignToken({...data}),
-          user: user,
-        };
-        return resp;
-    } else {
-      throw new Error('Invalid information');
+const create = async (req, res) => {
+    try {
+        const auth = await authService.create(req.body);
+        return successResponse(req, res, auth, 201);
+    } catch (error) {
+        return errorResponse(req, res, error.message, 500);
     }
-  });
 };
 
-const create = async (req, res, next) => {
-  try {
-    const data = req.body;
-    await Auth.sync();
-    password = await bcrypt.hash(data.password.toString(), 10);
-    created = await Auth.create({
-      id: data.id,
-      email: data.email,
-      password: password,
-    });
-    message = {
-      msg: "Record was created successfully",
-      regID: created.id,
-    };
-    response.success(req, res, message, 201);
-  } catch (error) {
-    next(error);
-  }
+const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const resp = await authService.login(email, password);
+        return successResponse(req, res, resp, 200);
+    } catch (error) {
+        return errorResponse(req, res, error.message, 401);
+    }
 };
 
 module.exports = {

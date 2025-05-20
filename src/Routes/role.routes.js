@@ -1,11 +1,10 @@
-const router = require ("express").Router();
-
-const controller = require ("../controllers/rol.controller");
+const router = require("express").Router();
+const controller = require("../controllers/role.controller");
 
 router.get("/", controller.getAll);
-router.get("/:id", controller.getOne);
-router.post("/", controller.created);
-router.put("/:id", controller.updated);
-router.delete("/", controller.deleted);
+router.get("/:id", controller.getById);
+router.post("/", controller.create);
+router.put("/:id", controller.update);
+router.delete("/:id", controller.remove);
 
 module.exports = router;

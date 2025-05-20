@@ -1,15 +1,28 @@
 const router = require("express").Router();
-const multer = require('multer');
-const storge = require("../middlewares/user-avatar.multer");
-
 const controller = require("../controllers/user.controller");
-const uploader = multer ({storage});
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "public/images/users/avatar/");
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + path.extname(file.originalname));
+    },
+});
+const uploader = multer({ storage });
 
 router.get("/", controller.getAll);
-router.get("/:id", controller.getOne);
+router.get("/:id", controller.getById);
 router.post("/", controller.create);
 router.put("/:id", controller.update);
-router.delete("/:id", controller.deleted);
-router.post('/images/avatar/:id', [uploader.single("avatar")],controller.uploadAvatar);
+router.delete("/:id", controller.remove);
+
+router.post(
+    "/images/avatar/:id",
+    uploader.single("avatar"),
+    controller.uploadAvatar
+);
 
 module.exports = router;
